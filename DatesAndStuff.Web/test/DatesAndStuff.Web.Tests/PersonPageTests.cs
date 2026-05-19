@@ -26,7 +26,7 @@ public class PersonPageTests
         var webProjectPath = Path.GetFullPath(Path.Combine(
             Assembly.GetExecutingAssembly().Location,
             "../../../../../../src/DatesAndStuff.Web/DatesAndStuff.Web.csproj"
-            ));
+        ));
 
         var webProjFolderPath = Path.GetDirectoryName(webProjectPath);
 
@@ -94,32 +94,92 @@ public class PersonPageTests
         {
             // Ignore errors if unable to close the browser
         }
+
         Assert.That(verificationErrors.ToString(), Is.EqualTo(""));
     }
 
     [Test]
-    public void Person_SalaryIncrease_ShouldIncrease()
+    [TestCase(5, 5250)]
+    [TestCase(10, 5500)]
+    [TestCase(0, 5000)]
+    [TestCase(-5, 4750)]
+    public void Person_SalaryIncrease_ShouldIncrease(double increasePercentage, double expectedSalary)
     {
         // Arrange
         driver.Navigate().GoToUrl(BaseURL);
         driver.FindElement(By.XPath("//*[@data-test='PersonPageNavigation']")).Click();
 
-        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-        var input = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
-        input.Clear();
-        input.SendKeys("5");
+        System.Threading.Thread.Sleep(1000);
+
+        var input = wait.Until(
+            ExpectedConditions.ElementToBeClickable(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+
+        input.SendKeys(Keys.Backspace + Keys.Backspace + Keys.Backspace);
+        input.SendKeys(Keys.Delete + Keys.Delete + Keys.Delete);
+        input.SendKeys(Keys.Backspace);
+
+        input.SendKeys(increasePercentage.ToString());
 
         // Act
-        var submitButton = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
+        var submitButton =
+            wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
         submitButton.Click();
 
 
         // Assert
         var salaryLabel = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='DisplayedSalary']")));
         var salaryAfterSubmission = double.Parse(salaryLabel.Text);
-        salaryAfterSubmission.Should().BeApproximately(5250, 0.001);
+        salaryAfterSubmission.Should().BeApproximately(expectedSalary, 0.001);
     }
+
+    [Test]
+    [TestCase("-10")]
+    [TestCase("-15")]
+    public void Person_SalaryIncrease_LessThanMinusTen_ShouldShowValidationErrors(double invalidPercentage)
+    {
+        // Arrange
+        driver.Navigate().GoToUrl(BaseURL);
+        driver.FindElement(By.XPath("//*[@data-test='PersonPageNavigation']")).Click();
+
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+        System.Threading.Thread.Sleep(1000);
+
+        var input = wait.Until(
+            ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+
+        input.SendKeys(Keys.Backspace + Keys.Backspace + Keys.Backspace);
+        input.SendKeys(Keys.Delete + Keys.Delete + Keys.Delete);
+        input.SendKeys(Keys.Backspace);
+
+        input.SendKeys(invalidPercentage.ToString());
+
+        // Act
+        var submitButton =
+            wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
+        submitButton.Click();
+
+        // Assert
+        // megvarjuk amig a validacios uzenet megjelenik
+        // az oldal tetejen
+        var topValidationMessage = wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-errors")));
+        topValidationMessage.Text.Should().Contain("between -10 and infinity");
+
+        // Assert
+        // a mezo alatt
+        var fieldValidationMessage =
+            wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-message")));
+        fieldValidationMessage.Text.Should().Contain("between -10 and infinity");
+
+        // Assert
+        // a fizetes nem valtozhat
+        var salaryLabel = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='DisplayedSalary']")));
+        var salaryAfterSubmission = double.Parse(salaryLabel.Text);
+        salaryAfterSubmission.Should().BeApproximately(5000, 0.001); // az eredeti 5000 maradt
+    }
+
     private bool IsElementPresent(By by)
     {
         try
@@ -160,6 +220,7 @@ public class PersonPageTests
             {
                 alert.Dismiss();
             }
+
             return alertText;
         }
         finally
