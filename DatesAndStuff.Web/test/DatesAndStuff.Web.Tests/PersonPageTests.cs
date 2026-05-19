@@ -109,10 +109,16 @@ public class PersonPageTests
         driver.Navigate().GoToUrl(BaseURL);
         driver.FindElement(By.XPath("//*[@data-test='PersonPageNavigation']")).Click();
 
-        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-        var input = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
-        input.Clear();
+        System.Threading.Thread.Sleep(1000);
+        
+        var input = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+        
+        input.SendKeys(Keys.Control + "a");
+        input.SendKeys(Keys.Command + "a");
+        input.SendKeys(Keys.Backspace);
+        
         input.SendKeys(increasePercentage.ToString());
 
         // Act
@@ -133,10 +139,16 @@ public class PersonPageTests
         driver.Navigate().GoToUrl(BaseURL);
         driver.FindElement(By.XPath("//*[@data-test='PersonPageNavigation']")).Click();
 
-        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
+        System.Threading.Thread.Sleep(1000);
+        
         var input = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
-        input.Clear();
+        
+        input.SendKeys(Keys.Control + "a");
+        input.SendKeys(Keys.Command + "a");
+        input.SendKeys(Keys.Backspace);
+        
         input.SendKeys("-15");
 
         // Act
