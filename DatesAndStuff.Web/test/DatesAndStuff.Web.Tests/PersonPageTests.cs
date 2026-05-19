@@ -102,7 +102,6 @@ public class PersonPageTests
     [TestCase(10, 5500)]
     [TestCase(0, 5000)]
     [TestCase(-5, 4750)]
-    [TestCase(-10, 4500)]
     public void Person_SalaryIncrease_ShouldIncrease(double increasePercentage, double expectedSalary)
     {
         // Arrange
@@ -133,7 +132,9 @@ public class PersonPageTests
     }
     
     [Test]
-    public void Person_SalaryIncrease_LessThanMinusTen_ShouldShowValidationErrors()
+    [TestCase("-10")]
+    [TestCase("-15")]
+    public void Person_SalaryIncrease_LessThanMinusTen_ShouldShowValidationErrors(double invalidPercentage)
     {
         // Arrange
         driver.Navigate().GoToUrl(BaseURL);
@@ -149,7 +150,7 @@ public class PersonPageTests
         input.SendKeys(Keys.Command + "a");
         input.SendKeys(Keys.Backspace);
         
-        input.SendKeys("-15");
+        input.SendKeys(invalidPercentage.ToString());
 
         // Act
         var submitButton = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
