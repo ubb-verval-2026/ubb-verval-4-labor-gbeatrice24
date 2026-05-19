@@ -145,8 +145,14 @@ public class PersonPageTests
 
         // Assert
         // megvarjuk amig a validacios uzenet megjelenik
-        var validationMessage = wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-message")));
-        validationMessage.Text.Should().Contain("between -10 and infinity");
+        // az oldal tetejen
+        var topValidationMessage = wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-errors")));
+        topValidationMessage.Text.Should().Contain("between -10 and infinity");
+
+        // Assert
+        // a mezo alatt
+        var fieldValidationMessage = wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-message")));
+        fieldValidationMessage.Text.Should().Contain("between -10 and infinity");
         
         // Assert
         // a fizetes nem valtozhat
