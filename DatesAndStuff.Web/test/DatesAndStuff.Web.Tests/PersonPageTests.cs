@@ -26,7 +26,7 @@ public class PersonPageTests
         var webProjectPath = Path.GetFullPath(Path.Combine(
             Assembly.GetExecutingAssembly().Location,
             "../../../../../../src/DatesAndStuff.Web/DatesAndStuff.Web.csproj"
-            ));
+        ));
 
         var webProjFolderPath = Path.GetDirectoryName(webProjectPath);
 
@@ -94,6 +94,7 @@ public class PersonPageTests
         {
             // Ignore errors if unable to close the browser
         }
+
         Assert.That(verificationErrors.ToString(), Is.EqualTo(""));
     }
 
@@ -111,17 +112,19 @@ public class PersonPageTests
         var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
         System.Threading.Thread.Sleep(1000);
-        
-        var input = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
-        
-        input.SendKeys(Keys.Control + "a");
-        input.SendKeys(Keys.Command + "a");
+
+        var input = wait.Until(
+            ExpectedConditions.ElementToBeClickable(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+
+        input.SendKeys(Keys.Backspace + Keys.Backspace + Keys.Backspace);
+        input.SendKeys(Keys.Delete + Keys.Delete + Keys.Delete);
         input.SendKeys(Keys.Backspace);
-        
+
         input.SendKeys(increasePercentage.ToString());
 
         // Act
-        var submitButton = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
+        var submitButton =
+            wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
         submitButton.Click();
 
 
@@ -130,7 +133,7 @@ public class PersonPageTests
         var salaryAfterSubmission = double.Parse(salaryLabel.Text);
         salaryAfterSubmission.Should().BeApproximately(expectedSalary, 0.001);
     }
-    
+
     [Test]
     [TestCase("-10")]
     [TestCase("-15")]
@@ -143,17 +146,19 @@ public class PersonPageTests
         var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
         System.Threading.Thread.Sleep(1000);
-        
-        var input = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
-        
-        input.SendKeys(Keys.Control + "a");
-        input.SendKeys(Keys.Command + "a");
+
+        var input = wait.Until(
+            ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreasePercentageInput']")));
+
+        input.SendKeys(Keys.Backspace + Keys.Backspace + Keys.Backspace);
+        input.SendKeys(Keys.Delete + Keys.Delete + Keys.Delete);
         input.SendKeys(Keys.Backspace);
-        
+
         input.SendKeys(invalidPercentage.ToString());
 
         // Act
-        var submitButton = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
+        var submitButton =
+            wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='SalaryIncreaseSubmitButton']")));
         submitButton.Click();
 
         // Assert
@@ -164,16 +169,17 @@ public class PersonPageTests
 
         // Assert
         // a mezo alatt
-        var fieldValidationMessage = wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-message")));
+        var fieldValidationMessage =
+            wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".validation-message")));
         fieldValidationMessage.Text.Should().Contain("between -10 and infinity");
-        
+
         // Assert
         // a fizetes nem valtozhat
         var salaryLabel = wait.Until(ExpectedConditions.ElementExists(By.XPath("//*[@data-test='DisplayedSalary']")));
         var salaryAfterSubmission = double.Parse(salaryLabel.Text);
         salaryAfterSubmission.Should().BeApproximately(5000, 0.001); // az eredeti 5000 maradt
     }
-    
+
     private bool IsElementPresent(By by)
     {
         try
@@ -214,6 +220,7 @@ public class PersonPageTests
             {
                 alert.Dismiss();
             }
+
             return alertText;
         }
         finally
